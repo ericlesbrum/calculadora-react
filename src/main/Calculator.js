@@ -16,12 +16,33 @@ const Calculator = () => {
         setState({ ...initialState })
     }
     const setOperation = (operation) => {
+        if (state.current === 0)
+            setState({ ...state, operation, current: 1, clearDisplay: true })
+        else {
+            const equals = operation === "=";
+            const currentOperation = state.operation;
+            const values = state.values;
+            try {
+                values[0] = eval(`${values[0]} ${currentOperation} ${values[1]}`)
+            } catch (e) {
+                values[0] = state.values[0]
+            }
+            values[1] = 0;
+            setState({
+                ...state,
+                displayValue: values[0],
+                operation: equals ? null : operation,
+                current: equals ? 0 : 1,
+                clearDisplay: !equals,
+                values
+            })
+        }
     }
     const addDigit = (number) => {
         if (number === '.' && state.displayValue.includes('.')) {
             return;
         }
-        const clearDisplay = state.displayValue == '0' || state.clearDisplay;
+        const clearDisplay = state.displayValue === '0' || state.clearDisplay;
         const currentValue = clearDisplay ? '' : state.displayValue;
         const displayValue = currentValue + number;
         const values = state.values;
